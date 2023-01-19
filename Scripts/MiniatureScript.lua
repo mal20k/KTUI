@@ -103,6 +103,10 @@ end
 
 function saveState()
   local old_state = self.script_state
+  -- why are we missing attachments?
+  if state.attachments == nil then
+    state.attachments = {}
+  end
   self.script_state = JSON.encode(state)
   if old_state != self.script_state then
     local event = {
@@ -308,6 +312,10 @@ function refreshUI()
   local totalSecrets = 0
 
   local secretxmlAttachmentFormatted = "--@SecretsPlaceholder"
+  if state.attachments == nil then
+    -- whyy
+    state.attachments = {}
+  end
   for _,i in pairs(state.attachments) do
     if i.equipment == true and i.active == true then
       totalSecrets = totalSecrets + 1

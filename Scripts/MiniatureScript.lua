@@ -102,7 +102,17 @@ function onNumberTyped( pc, n )
 end
 
 function saveState()
+  local old_state = self.script_state
   self.script_state = JSON.encode(state)
+  if old_state != self.script_state then
+    local event = {
+      guid = self.getGUID(),
+      old_state = old_state,
+      cur_state = self.script_state
+    }
+    local scoreboardGuid = "339b7f"
+    getObjectFromGUID(scoreboardGuid).call("gameLogAppendOperativeChangedState", event)
+  end
 end
 
 function loadState()

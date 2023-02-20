@@ -240,6 +240,7 @@ function callback_orders(player, value, id)
   end
   refreshUI()
   refreshWounds()
+  saveState()
 end
 
 function refreshUI()

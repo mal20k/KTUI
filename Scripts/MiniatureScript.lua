@@ -114,8 +114,8 @@ function saveState()
       old_state = old_state,
       cur_state = self.script_state
     }
-    local scoreboardGuid = "339b7f"
-    getObjectFromGUID(scoreboardGuid).call("gameLogAppendOperativeChangedState", event)
+    local gamelogGuid = "bafa93"
+    getObjectFromGUID(gamelogGuid).call("gameLogAppendOperativeChangedState", event)
   end
 end
 
@@ -313,6 +313,7 @@ function refreshUI()
   local totalSecrets = 0
 
   local secretxmlAttachmentFormatted = "--@SecretsPlaceholder"
+
   if state.attachments == nil then
     -- whyy
     state.attachments = {}

@@ -133,12 +133,23 @@ function savePosition(p, r)
   self.highlightOn(Color(0.19, 0.63, 0.87), 0.5)
 end
 
-function loadPosition()
+function loadPosition(pc)
   local sp = state.savePos
+  local event = {
+    id = self.getGUID(),
+    operative = self.getName(),
+    coords= sp.position,
+    old_coords = self.getPosition(),
+    player = Player[pc].steam_name
+  }
   if sp then
     self.setPositionSmooth(sp.position, false, true)
     self.setRotationSmooth(sp.rotation, false, true)
     self.highlightOn(Color(0.87, 0.43, 0.19), 0.5)
+  end
+  local gamelog = getObjectFromGUID("bafa93")
+  if gamelog then
+    gamelog.call("gameLogAppendOperativeMovedEvent", event)
   end
 end
 
@@ -486,7 +497,7 @@ function onLoad(ls)
   self.addContextMenuItem("Conceal", function(pc)  setConceal() end)
   self.addContextMenuItem("Kill", kill)
   self.addContextMenuItem("Save place", function(pc) savePosition() end)
-  self.addContextMenuItem("Load place", function(pc) loadPosition() end)
+  self.addContextMenuItem("Load place", function(pc) loadPosition(pc) end)
   self.addContextMenuItem("Update stats", updateStats)
 
   for i, w in ipairs(state.info.weapons) do

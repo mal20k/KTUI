@@ -79,6 +79,7 @@ measureColor           = nil
 measureRange           = 0
 
 function onNumberTyped( pc, n )
+  local handled = true
   rangeShown = n > 0
   measureColor = Color.fromString(pc)
   measureRange = n
@@ -94,11 +95,13 @@ function onNumberTyped( pc, n )
           size         = {sphereRange,sphereRange,sphereRange},
           max_distance = 0,
           debug        = true,
-      })
+    })
+    handled = false -- allow other handlers to trigger (eg: state change)
   end
   lastRange = measureRange
   refreshVectors()
   Player[pc].broadcast(string.format("%d\"", measureRange))
+  return handled
 end
 
 function saveState()

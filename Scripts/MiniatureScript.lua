@@ -498,6 +498,15 @@ function onLoad(ls)
   self.addContextMenuItem("Kill", kill)
   self.addContextMenuItem("Save place", function(pc) savePosition() end)
   self.addContextMenuItem("Load place", function(pc) loadPosition(pc) end)
+  local operative = self
+  self.addContextMenuItem("Show range", function(pc)
+    Player[pc].showInputDialog(
+      "Enter desired range: (0 to disable)",
+      function (text, player_color)
+        onNumberTyped(player_color, tonumber(text))
+      end
+    )
+  end)
   self.addContextMenuItem("Update stats", updateStats)
 
   for i, w in ipairs(state.info.weapons) do

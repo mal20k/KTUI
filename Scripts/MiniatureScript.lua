@@ -160,7 +160,7 @@ end
 function refreshWounds()
 
   local w = state.wounds
-  local m = state.stats.W
+  local m = state.stats.Wounds
 
   local uiwstring = function()
     if w == 0 then
@@ -304,7 +304,7 @@ function refreshUI()
 	<Panel color="#808080" outline="#FF5500" outlineSize="2 2" width="80" height="25" offsetXY="]]..circOffset(40, 270)..[[">
     <Image id="ktcnid-status-injured" image="Wound_]]..wound_color..[[" width="30" height="30" rectAlignment="MiddleLeft" offsetXY="]]..off_injured..[[ 0" active="]]..tostring(isInjured())..[[" />
 		<Button text="-" width="30" height="30" offsetXY="-65 0" onClick="damage" active="]]..tostring((state.display_arrows or false))..[[" />
-		<Text id="ktcnid-status-wounds" text="]]..string.format("%d/%d", state.wounds or 0, state.stats.W or 0)..[[" resizeTextForBestFit="true" color="#ffffff" onClick="toggleArrows" />
+		<Text id="ktcnid-status-wounds" text="]]..string.format("%d/%d", state.wounds or 0, state.stats.Wounds or 0)..[[" resizeTextForBestFit="true" color="#ffffff" onClick="toggleArrows" />
 		<Button text="+" width="30" height="30" offsetXY="65 0" onClick="heal" active="]]..tostring((state.display_arrows or false))..[[" />
     <Image id="ktcnid-status-order" image="]]..getCurrentOrder()..[[" rectAlignment="MiddleRight" width="55" height="55" offsetXY="]]..off_order..[[ 0" active="true" onClick="callback_orders" />
 	</Panel>
@@ -395,7 +395,7 @@ function createUI()
 end
 
 function isInjured()
-  return state.stats.W and state.wounds < state.stats.W / 2 or false
+  return state.stats.Wounds and state.wounds < state.stats.Wounds / 2 or false
 end
 
 function notify(pc, message)
@@ -429,7 +429,7 @@ end
 
 function heal(pc)
   local si = isInjured()
-  state.wounds = math.min((state.stats.W or 0), (state.wounds or 0) + 1)
+  state.wounds = math.min((state.stats.Wounds or 0), (state.wounds or 0) + 1)
   if si and not isInjured() then
     self.UI.hide("ktcnid-status-injured")
   end
@@ -452,7 +452,7 @@ function updateStats(pc)
   end
   notify(pc, "Updating stats from values in description")
   local statsub = {}
-  local prevW = state.stats.W or 0
+  local prevW = state.stats.Wounds or 0
   local wounds = state.wounds or 0
   local desc = self.getDescription() or ""
   local innerUpdate = function(stat)
@@ -472,16 +472,14 @@ function updateStats(pc)
     table.insert(statsub, string.format("%s = [ff0000]X[-]", stat))
     return false
   end
-  innerUpdate("M")
+  innerUpdate("MOVE")
   innerUpdate("APL")
-  innerUpdate("GA")
-  innerUpdate("DF")
-  innerUpdate("SV")
-  if innerUpdate("W") then
+  innerUpdate("SAVE")
+  if innerUpdate("WOUNDS") then
     if wounds == prevW then
-      state.wounds = state.stats.W or 0
+      state.wounds = state.stats.Wounds or 0
     else
-      state.wounds = min(state.stats.W or 0)
+      state.wounds = min(state.stats.Wounds or 0)
     end
     refreshWounds()
   end
@@ -538,8 +536,8 @@ end
 
 function callback_Attack(i)
     local weaponName = state.info.weapons[i].name:gsub("%(R%)", "[1E87FF]R[-]"):gsub("%(M%)", "[F4641D]M[-]")
-    local weaponAttacks = state.info.weapons[i].stats["A"]
-    local weaponLimit = state.info.weapons[i].stats["WS/BS"]
+    local weaponAttacks = state.info.weapons[i].stats["ATK"]
+    local weaponLimit = state.info.weapons[i].stats["HIT"]
 
 	if isInjured() == true then
 		weaponLimit = weaponLimit + 1

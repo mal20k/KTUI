@@ -766,10 +766,10 @@ function onCollisionEnter(a)
     if newState:startswith("Engage") then state.order = "Engage" else state.order = "Conceal" end
     if newState:endswith("ready") then state.ready = true else state.ready = false end
     mustRefresh = true
-  elseif a.collision_object.hasTag("KTUITokenSimple") or a.collision_object.hasTag("KTUITokenEquipment") or a.collision_object.hasTag("KTUITokenStackable") then
+  elseif a.collision_object.hasTag("KTUITokenSimple") or a.collision_object.hasTag("KTUITokenEquipment") or a.collision_object.hasTag("KTUIStackable") then
     local newState = a.collision_object.getDescription()
     local imageUrl = a.collision_object.getCustomObject().image
-    local stackable = a.collision_object.getCustomObject().stackable or a.collision_object.hasTag("KTUITokenStackable")
+    local stackable = a.collision_object.getCustomObject().stackable or a.collision_object.hasTag("KTUIStackable")
     local equipment = a.collision_object.hasTag("KTUITokenEquipment")
     local removable = true
     a.collision_object.destruct()

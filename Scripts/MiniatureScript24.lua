@@ -447,8 +447,8 @@ end
 
 function updateStats(pc)
   if getOwningPlayer().color ~= pc then
-    notify(pc, "Only the model's owner can update stats")
-    return
+      notify(pc, "Only the model's owner can update stats")
+      return
   end
   notify(pc, "Updating stats from values in description")
   local statsub = {}
@@ -456,35 +456,44 @@ function updateStats(pc)
   local wounds = state.wounds or 0
   local desc = self.getDescription() or ""
   local innerUpdate = function(stat)
-    local sstring = "%[84E680%]" .. stat .. "%[%-%]%s*%[ffffff%]%s*(%d+).*%[%-%]"
-    for match in string.gmatch(desc, "%b[]") do
-      local s = match:match(sstring)
-      if s then
-        local ss = state.stats[stat]
-        table.insert(statsub, string.format("%s = %s", stat, s))
-        if ss and ss == tonumber(s) then return false end
-        state.stats[stat] = tonumber(s)
+      local statNames = {
+          ["WOUNDS"] = "Wounds",
+          ["APL"] = "APL",
+          ["MOVE"] = "Move",
+          ["SAVE"] = "Save",
+      }
+      local innerStat = statNames[stat]
+      local sstring = "%[84E680%]" .. stat .. "%[%-%]%s*%[ffffff%]%s*(%d+).*%[%-%]"
+      for match in string.gmatch(desc, "%b[]") do
+          local s = match:match(sstring)
+          if s then
+              local ss = state.stats[innerStat]
+              table.insert(statsub, string.format("%s = %s", stat, s))
+              if ss and ss == tonumber(s) then
+                  return false
+              end
+              state.stats[innerStat] = tonumber(s)
 
-        -- notify(pc, string.format("%s set to %s", stat, s))
-        return true
+              -- notify(pc, string.format("%s set to %s", stat, s))
+              return true
+          end
       end
-    end
-    table.insert(statsub, string.format("%s = [ff0000]X[-]", stat))
-    return false
+      table.insert(statsub, string.format("%s = [ff0000]X[-]", stat))
+      return false
   end
-  innerUpdate("MOVE")
   innerUpdate("APL")
+  innerUpdate("MOVE")
   innerUpdate("SAVE")
   if innerUpdate("WOUNDS") then
-    if wounds == prevW then
-      state.wounds = state.stats.Wounds or 0
-    else
-      state.wounds = min(state.stats.Wounds or 0)
-    end
-    refreshWounds()
+      if wounds == prevW then
+          state.wounds = state.stats.Wounds or 0
+      else
+          state.wounds = min(state.stats.Wounds or 0)
+      end
+      refreshWounds()
   end
   saveState()
-  notify(pc, table.concat( statsub, ", "))
+  notify(pc, table.concat(statsub, ", "))
 end
 
 function onLoad(ls)

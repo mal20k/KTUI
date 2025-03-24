@@ -25,7 +25,7 @@ end
 
 function ExtendUI(player)
 	WebRequest.get(
-		"https://raw.githubusercontent.com/mal20k/KTUI/refs/heads/mathomas/kt24/Scripts/MiniatureScript.lua",
+		"https://raw.githubusercontent.com/mal20k/KTUI/refs/heads/main/Scripts/MiniatureScript24.lua",
 		function(req)
 			if req.is_error then
 				log(req.error)
@@ -40,18 +40,6 @@ function ExtendUI(player)
 			end
 		end
 	)
-end
-
-function ExtendModelUI(player, object, script)
-	if object.tag == "Figurine" then
-		somethingExtended = true
-		object.setLuaScript(script)
-		object = object.reload()
-		object.addTag("KTUIMini")
-		Wait.frames(function()
-			object.call("setOwningPlayer", player.steam_id)
-		end, 1)
-	end
 end
 
 function SaveAllPositions(player)
@@ -104,9 +92,21 @@ function CleanAllOperatives(player)
 	player.broadcast("All operatives have cleaned of their tokens")
 end
 
+function UpdateModelScript(player, object, script)
+	if object.tag == "Figurine" then
+		somethingExtended = true
+		object.setLuaScript(script)
+		object = object.reload()
+		object.addTag("KTUIMini")
+		Wait.frames(function()
+			object.call("setOwningPlayer", player.steam_id)
+		end, 1)
+	end
+end
+
 function UpdateScript(player)
 	WebRequest.get(
-		"https://raw.githubusercontent.com/mal20k/KTUI/refs/heads/mathomas/kt24/Scripts/MiniatureScript.lua",
+		"https://raw.githubusercontent.com/mal20k/KTUI/refs/heads/main/Scripts/MiniatureScript24.lua",
 		function(req)
 			if req.is_error then
 				log(req.error)
@@ -116,8 +116,7 @@ function UpdateScript(player)
 
 				for _, hitlist in ipairs(allTops) do
 					local object = hitlist["hit_object"]
-					UpdateOldState(object)
-					ExtendModelUI(player, object, script)
+					UpdateModelScript(player, object, script)
 				end
 			end
 		end
@@ -201,14 +200,35 @@ function ParseExtra(desc)
 	return lines
 end
 
+function UpdateOldModels(player)
+	WebRequest.get(
+		"https://raw.githubusercontent.com/mal20k/KTUI/refs/heads/main/Scripts/MiniatureScript24.lua",
+		function(req)
+			local allTops = detectItemOnTop()
+			local script = req.text
+
+			for _, hitlist in ipairs(allTops) do
+				local object = hitlist["hit_object"]
+				UpdateOldState(object)
+				UpdateModelScript(player, object, script)
+			end
+		end
+	)
+end
+
 function UpdateOldState(object)
 	if object.tag == "Figurine" then
 		local state = JSON.decode(object.script_state)
 
 		state.stats.Move = state.stats.M * 2
-		state.stats.APL = state.stats.APL
+		-- state.stats.APL = state.stats.APL
 		state.stats.Save = state.stats.SV
 		state.stats.Wounds = state.stats.W
+
+		-- We remove the old stats to avoid issues with attempts to detect which stats are used.
+		state.stats.M = nil
+		state.stats.SV = nil
+		state.stats.W = nil
 
 		local desc = object.getDescription() or ""
 

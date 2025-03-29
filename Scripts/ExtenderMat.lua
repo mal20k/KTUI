@@ -35,7 +35,7 @@ function ExtendUI(player)
 
 				for _, hitlist in ipairs(allTops) do
 					local object = hitlist["hit_object"]
-					ExtendModelUI(player, object, script)
+					UpdateModelScript(player, object, script)
 				end
 			end
 		end
@@ -220,10 +220,21 @@ function UpdateOldState(object)
 	if object.tag == "Figurine" then
 		local state = JSON.decode(object.script_state)
 
-		state.stats.Move = state.stats.M * 2
+		if state.stats.M then
+			state.stats.Move = state.stats.M * 2
+		end
+
+		-- if state.stats.APL then
 		-- state.stats.APL = state.stats.APL
-		state.stats.Save = state.stats.SV
-		state.stats.Wounds = state.stats.W
+		-- end
+
+		if state.stats.SV then
+			state.stats.Save = state.stats.SV
+		end
+
+		if state.stats.W then
+			state.stats.Wounds = state.stats.W
+		end
 
 		-- We remove the old stats to avoid issues with attempts to detect which stats are used.
 		state.stats.M = nil

@@ -117,8 +117,10 @@ function saveState()
       old_state = old_state,
       cur_state = self.script_state
     }
-    local gamelogGuid = "bafa93"
-    getObjectFromGUID(gamelogGuid).call("gameLogAppendOperativeChangedState", event)
+    local gamelog = getObjectFromGUID("bafa93")
+    if gamelog then
+      gamelog.call("gameLogAppendOperativeChangedState", event)
+    end
   end
 end
 
@@ -446,10 +448,25 @@ function kill(pc)
 end
 
 function updateStats(pc)
-  if getOwningPlayer().color ~= pc then
+  local owningPlayer = getOwningPlayer()
+
+  -- If the owning player is nil, then the owning player is not at the table.
+  -- This can happen if using models encoded by another player, so the owning player
+  -- not being found is fine and we can allow a non-owning player to make changes to the model.
+  -- The player to make the change becomes the owner of the model.
+  if owningPlayer == nil then
+    local newOwner = Player[pc].steam_id
+    setOwningPlayer(newOwner)
+    refreshVectors()
+    hideSecrets()
+    owningPlayer = getOwningPlayer()
+  end
+
+  if owningPlayer.color ~= pc then
     notify(pc, "Only the model's owner can update stats")
     return
   end
+
   notify(pc, "Updating stats from values in description")
   local statsub = {}
   local prevW = state.stats.Wounds or 0

@@ -243,6 +243,26 @@ function UpdateOldState(object)
 
 		local desc = object.getDescription() or ""
 
+		local innerUpdate = function(oldStat, newStat)
+			local sstring = "%[84E680%]" .. oldStat .. "%[%-%]%s*%[ffffff%]%s*(%d+).*%[%-%]"
+			for match in string.gmatch(desc, "%b[]") do
+				local s = match:match(sstring)
+				if s then
+					local ss = state.stats[newStat]
+					if ss and ss == tonumber(s) then
+						return false
+					end
+					state.stats[newStat] = tonumber(s)
+					return true
+				end
+			end
+			return false
+		end
+		innerUpdate("M", "Move")
+		innerUpdate("APL", "APL")
+		innerUpdate("SV", "Save")
+		innerUpdate("W", "Wounds")
+
 		local weapons = ParseWeapons(desc)
 		local newWeapons = {}
 		for i, weaponLines in ipairs(weapons) do
